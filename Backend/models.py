@@ -42,6 +42,10 @@ class ProductData:
         products = self.df[start:start+limit]
         return products.to_json(orient='records')
     
+    def get_products_by_ids(self, ids):
+        products = self.df[self.df['id'].isin(ids)]
+        return products.to_json(orient='records')
+    
     def get_products_by_category(self, category, start = 0, limit = 10):
         products = self.df[self.df['category'] == category]
         return products[start:start+limit].to_json(orient='records')
@@ -49,7 +53,7 @@ class ProductData:
 
 class UserInteraction:
     @staticmethod
-    def log_or_update_interaction(user_id, product_id, view_duration, added_to_cart):
+    def log_or_update_interaction(user_id, product_id, added_to_cart = False):
         # Check if an interaction for this user and product already exists
         interaction = mongo.db.user_interactions.find_one({
             "user_id": user_id,
@@ -60,7 +64,6 @@ class UserInteraction:
             # Update the existing interaction
             update_data = {
                 "timestamp": datetime.utcnow(),
-                "view_duration": max(interaction.get("view_duration", 0), view_duration),
                 "added_to_cart": interaction.get("added_to_cart", False) or added_to_cart
             }
             mongo.db.user_interactions.update_one(
@@ -74,7 +77,6 @@ class UserInteraction:
                 "user_id": user_id,
                 "product_id": product_id,
                 "timestamp": datetime.utcnow(),
-                "view_duration": view_duration,
                 "added_to_cart": added_to_cart
             }
             mongo.db.user_interactions.insert_one(new_interaction)
