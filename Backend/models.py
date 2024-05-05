@@ -50,33 +50,3 @@ class ProductData:
         products = self.df[self.df['category'] == category]
         return products[start:start+limit].to_json(orient='records')
 
-
-class UserInteraction:
-    @staticmethod
-    def log_or_update_interaction(user_id, product_id, added_to_cart = False):
-        # Check if an interaction for this user and product already exists
-        interaction = mongo.db.user_interactions.find_one({
-            "user_id": user_id,
-            "product_id": product_id
-        })
-
-        if interaction:
-            # Update the existing interaction
-            update_data = {
-                "timestamp": datetime.utcnow(),
-                "added_to_cart": interaction.get("added_to_cart", False) or added_to_cart
-            }
-            mongo.db.user_interactions.update_one(
-                {"_id": interaction["_id"]},
-                {"$set": update_data}
-            )
-        else:
-            # Create a new interaction
-            new_interaction = {
-                "_id": ObjectId(),
-                "user_id": user_id,
-                "product_id": product_id,
-                "timestamp": datetime.utcnow(),
-                "added_to_cart": added_to_cart
-            }
-            mongo.db.user_interactions.insert_one(new_interaction)

@@ -1,58 +1,35 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import styled from "styled-components";
-import Address from "./Components/Address";
-import Checkout from "./Components/Checkout";
+import Homepage from "./Homepage/Homepage";
+import './App.css';
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import ProductsPage from "./ProductsPage/ProductsPage";
+import SearchPage from "./SearchPage/SearchPage";
+import Signin from "./Authentication/Signin";
+import Signup from "./Authentication/Signup";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Logout from "./Authentication/Logout";
 
-import Home from "./Components/Home";
-import Login from "./Components/Login";
-import Payment from "./Components/Payment";
-import SignUp from "./Components/SignUp";
-
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
-import AddProduct from "./Components/AddProduct";
-import Orders from "./Components/Orders";
-
-const promise = loadStripe(
-  "pk_test_51KUDBXSE1AGsrDtwyXK8vcHYNkEOofJAP1vV1fRlpZNo93g4o80dZe4IvhAkBXo2ytDciCqqpynwQUXv7plCjezF00G9zyj4sc"
-);
 
 function App() {
+  document.body.style.margin = "0";
+  document.body.style.padding = "0";
   return (
-    <Router>
-      <Container>
+    <div className="App" style={{width:"100vw", height:"100vh", display:"flex", flexDirection:"column", margin:"0"}}>
+      <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          {/* Product routes like /product/:id would go here */}
+          <Route path = "/product/:id" element={<ProductsPage/>}/>
+          <Route path = "/search/:searchTerm" element={<SearchPage/>}/>
+          <Route path = "/login" element={<Signin/>}/>
+          <Route path = "/logout" element={<Logout/>}/>
+          <Route path = "/signup" element={<Signup/>}/>
 
-          <Route path="/login" element={<Login />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/address" element={<Address />} />
-          <Route
-            path="/payment"
-            element={
-              <Elements stripe={promise}>
-                <Payment />
-              </Elements>
-            }
-          />
-
-          <Route path="/addproduct" element={<AddProduct />} />
-          <Route path="/orders" element={<Orders />} />
+          <Route path="/" element={<Homepage/>}/>
         </Routes>
-      </Container>
-    </Router>
+      </Router>
+      <ToastContainer position="bottom-center" />
+    </div>
   );
 }
-
-const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
-overflow-y: scroll;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
 
 export default App;

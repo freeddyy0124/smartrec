@@ -25,7 +25,7 @@ def signup():
     # Create JWT token for the new user
     access_token = create_access_token(identity=email)
     response = jsonify({'message': 'User created successfully'})
-    set_access_cookies(response, access_token)  # Set JWT in cookies
+    set_access_cookies(response, access_token, max_age=9999999999)
 
     return response, 201
 
@@ -44,7 +44,7 @@ def signin():
     if bcrypt.check_password_hash(existingUser['password'], password):
         access_token = create_access_token(identity=email)
         response = jsonify({'message': 'User signed in successfully'})
-        set_access_cookies(response, access_token)
+        set_access_cookies(response, access_token, max_age=9999999999)
         return response, 200
     else:
         return jsonify({'error': 'Invalid Credentials'}), 400
@@ -53,7 +53,7 @@ def signin():
 @auth_blueprint.route('/signout', methods=['POST'])
 def signout():
     response = jsonify({'message': 'User signed out successfully'})
-    response.set_cookie('access_token_cookie', '', expires=0)  # Clear JWT cookie
+    response.delete_cookie('access_token')
     return response, 200
 
 def current_user():
@@ -76,7 +76,7 @@ def current_user():
         return jsonify({'currentUser': None}), 200
     
 @auth_blueprint.route('/currentuser', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def get_current_user():
     return current_user()
 
